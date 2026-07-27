@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Spam Detector | AI Classification & Intelligence</title>
+  <meta name="description" content="Real-time AI-powered Email Spam and Phishing Detection Web Application featuring Naive Bayes ML classification, explainable feature breakdown, and security header inspection.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-icon">📧</div>
+      <div>
+        <h1 class="brand-title">Email Spam Detector</h1>
+        <div class="brand-subtitle">Smart Email Classification Engine</div>
+      </div>
+    </div>
+    <div class="header-status">
+      <div class="status-pill">
+        <span class="status-dot"></span>
+        <span>ML Model Ready</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- App Main Container -->
+  <div class="app-container">
+
+    <!-- Navigation Sidebar -->
+    <aside class="sidebar">
+      <nav class="nav-card">
+        <div class="section-label">Navigation</div>
+        <ul class="nav-menu">
+          <li class="nav-item active" data-tab="tab-analyzer" id="nav-analyzer">
+            <span class="nav-icon">🔍</span>
+            <span>Live Analyzer</span>
+          </li>
+          <li class="nav-item" data-tab="tab-benchmarks" id="nav-benchmarks">
+            <span class="nav-icon">📊</span>
+            <span>Model Metrics</span>
+          </li>
+          <li class="nav-item" data-tab="tab-rules" id="nav-rules">
+            <span class="nav-icon">⚙️</span>
+            <span>Rule Engine</span>
+          </li>
+          <li class="nav-item" data-tab="tab-headers" id="nav-headers">
+            <span class="nav-icon">🌐</span>
+            <span>Header Inspector</span>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Preset Email Launcher -->
+      <div class="preset-card">
+        <div class="section-label">Sample Test Corpus</div>
+        <div class="preset-list" id="preset-list-container">
+          <!-- Dynamically populated presets -->
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Workspace Content -->
+    <main class="main-content">
+
+      <!-- TAB 1: Live Email Analyzer -->
+      <section id="tab-analyzer" class="tab-pane active">
+        <!-- Input Form -->
+        <div class="glass-card">
+          <div class="card-title">
+            <span>✉️ Email Content Input</span>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <label for="sensitivity-select" class="form-label" style="margin: 0; font-size: 0.78rem;">Sensitivity:</label>
+              <select id="sensitivity-select" class="form-select" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;">
+                <option value="permissive">Permissive (Low FPs)</option>
+                <option value="balanced" selected>Balanced (Standard)</option>
+                <option value="strict">Strict (High Defense)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="input-grid">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div class="form-group">
+                <label for="sender-input" class="form-label">Sender Address (From)</label>
+                <input type="email" id="sender-input" class="form-input" placeholder="e.g. security@bank-online.com">
+              </div>
+              <div class="form-group">
+                <label for="subject-input" class="form-label">Subject Line</label>
+                <input type="text" id="subject-input" class="form-input" placeholder="e.g. URGENT: Verify your account immediately">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="body-input" class="form-label">Email Body Content</label>
+              <textarea id="body-input" class="form-textarea" placeholder="Paste or type email body text here..."></textarea>
+            </div>
+
+            <div class="btn-row">
+              <div class="btn-group">
+                <button id="btn-analyze" class="btn btn-primary">
+                  <span>⚡ Analyze Spam Risk</span>
+                </button>
+                <button id="btn-clear" class="btn btn-secondary">
+                  <span>🗑️ Clear</span>
+                </button>
+              </div>
+              <button id="btn-sample" class="btn btn-secondary">
+                <span>🎲 Load Random Sample</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Output Classification & Risk Diagnostics -->
+        <div class="output-grid">
+          <!-- Risk Gauge Card -->
+          <div class="glass-card gauge-card">
+            <div class="card-title" style="width: 100%;">
+              <span>Risk Assessment</span>
+            </div>
+            
+            <div class="gauge-container">
+              <svg class="gauge-svg" viewBox="0 0 200 120">
+                <path class="gauge-bg" d="M 20 100 A 80 80 0 0 1 180 100"></path>
+                <path id="gauge-meter-path" class="gauge-meter" d="M 20 100 A 80 80 0 0 1 180 100"></path>
+              </svg>
+              <div class="gauge-score">
+                <span id="score-value-text" class="score-value">0%</span>
+                <span class="score-label">Spam Score</span>
+              </div>
+            </div>
+
+            <div id="result-badge-container">
+              <span class="badge-result badge-ham">Ready for Analysis</span>
+            </div>
+          </div>
+
+          <!-- Risk Factor Category Breakdown -->
+          <div class="glass-card">
+            <div class="card-title">
+              <span>📊 Diagnostic Risk Vectors</span>
+            </div>
+
+            <div class="risk-factors-list">
+              <div class="factor-item">
+                <div class="factor-header">
+                  <span>⚡ Urgency & Threat Cues</span>
+                  <span id="score-urgency">0%</span>
+                </div>
+                <div class="progress-track">
+                  <div id="bar-urgency" class="progress-fill fill-urgency" style="width: 0%;"></div>
+                </div>
+              </div>
+
+              <div class="factor-item">
+                <div class="factor-header">
+                  <span>🔗 Suspicious Links & Domains</span>
+                  <span id="score-links">0%</span>
+                </div>
+                <div class="progress-track">
+                  <div id="bar-links" class="progress-fill fill-links" style="width: 0%;"></div>
+                </div>
+              </div>
+
+              <div class="factor-item">
+                <div class="factor-header">
+                  <span>💰 Financial & Lottery Triggers</span>
+                  <span id="score-financial">0%</span>
+                </div>
+                <div class="progress-track">
+                  <div id="bar-financial" class="progress-fill fill-financial" style="width: 0%;"></div>
+                </div>
+              </div>
+
+              <div class="factor-item">
+                <div class="factor-header">
+                  <span>🔤 Formatting & Punctuation Anomalies</span>
+                  <span id="score-formatting">0%</span>
+                </div>
+                <div class="progress-track">
+                  <div id="bar-formatting" class="progress-fill fill-formatting" style="width: 0%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inline Keyword Highlighter & Feature Contribution -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+          <div class="glass-card">
+            <div class="card-title">
+              <span>🎯 Text Threat Scanner</span>
+              <span style="font-size: 0.75rem; color: var(--text-dim);">Live Trigger Highlights</span>
+            </div>
+            <div id="scanner-view" class="scanner-box">
+              Click 'Analyze Spam Risk' to view suspicious keyword highlights...
+            </div>
+          </div>
+
+          <div class="glass-card">
+            <div class="card-title">
+              <span>🧠 Explainable AI Signals</span>
+              <span style="font-size: 0.75rem; color: var(--text-dim);">TF-IDF Feature Weights</span>
+            </div>
+            <div>
+              <div class="section-label" style="margin-bottom: 0.4rem;">Top Spam Indicators (+)</div>
+              <div id="chips-spam-container" class="keyword-chips">
+                <span class="chip chip-spam">No analysis performed</span>
+              </div>
+
+              <div class="section-label" style="margin-top: 1.25rem; margin-bottom: 0.4rem;">Top Legitimate Signals (-)</div>
+              <div id="chips-ham-container" class="keyword-chips">
+                <span class="chip chip-ham">No analysis performed</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: Model Metrics & Benchmark Performance -->
+      <section id="tab-benchmarks" class="tab-pane">
+        <div class="glass-card">
+          <div class="card-title">
+            <span>📈 Model Benchmark Performance</span>
+            <button id="btn-run-benchmark" class="btn btn-primary" style="padding: 0.4rem 0.9rem; font-size: 0.8rem;">
+              <span>▶️ Run Full Test Suite</span>
+            </button>
+          </div>
+
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <span class="metric-lbl">Accuracy Score</span>
+              <span id="metric-accuracy" class="metric-val">--%</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-lbl">Precision</span>
+              <span id="metric-precision" class="metric-val">--%</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-lbl">Recall Rate</span>
+              <span id="metric-recall" class="metric-val">--%</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-lbl">F1-Score</span>
+              <span id="metric-f1" class="metric-val">--%</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 360px 1fr; gap: 1.5rem;">
+          <!-- Confusion Matrix Card -->
+          <div class="glass-card">
+            <div class="card-title">
+              <span>🎯 Confusion Matrix</span>
+            </div>
+            <table class="matrix-table">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Pred Spam</th>
+                  <th>Pred Ham</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>Actual Spam</th>
+                  <td id="cell-tp" class="cell-tp">TP: -</td>
+                  <td id="cell-fn" class="cell-fn">FN: -</td>
+                </tr>
+                <tr>
+                  <th>Actual Ham</th>
+                  <td id="cell-fp" class="cell-fp">FP: -</td>
+                  <td id="cell-tn" class="cell-tn">TN: -</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Benchmark Test Details Table -->
+          <div class="glass-card">
+            <div class="card-title">
+              <span>📋 Benchmark Corpus Test Results</span>
+            </div>
+            <div style="max-height: 280px; overflow-y: auto;">
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Test Email Title</th>
+                    <th>Expected</th>
+                    <th>Predicted</th>
+                    <th>Risk Score</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="benchmark-results-body">
+                  <tr><td colspan="5" style="text-align: center; color: var(--text-dim);">Click 'Run Full Test Suite' to evaluate benchmark emails.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: Rule Engine & Customs -->
+      <section id="tab-rules" class="tab-pane">
+        <div class="glass-card">
+          <div class="card-title">
+            <span>➕ Create Custom Filter Rule</span>
+          </div>
+          <form id="add-rule-form">
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; align-items: end;">
+              <div class="form-group">
+                <label for="rule-pattern" class="form-label">Keyword / Phrase Pattern</label>
+                <input type="text" id="rule-pattern" class="form-input" placeholder="e.g. wire transfer money" required>
+              </div>
+              <div class="form-group">
+                <label for="rule-type" class="form-label">Action Type</label>
+                <select id="rule-type" class="form-select">
+                  <option value="blacklist">Blacklist (Spam +)</option>
+                  <option value="whitelist">Whitelist (Trust -)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="rule-weight" class="form-label">Weight (1 - 5)</label>
+                <input type="number" id="rule-weight" class="form-input" min="1" max="5" step="0.5" value="3.0">
+              </div>
+              <button type="submit" class="btn btn-primary" style="height: 42px;">
+                <span>➕ Add Rule</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="glass-card">
+          <div class="card-title">
+            <span>⚙️ Active Filter Rules</span>
+          </div>
+          <table class="rules-table">
+            <thead>
+              <tr>
+                <th>Active</th>
+                <th>Pattern</th>
+                <th>Category</th>
+                <th>Type</th>
+                <th>Weight</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="rules-table-body">
+              <!-- Dynamically rendered rules -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 4: Email Header Inspector -->
+      <section id="tab-headers" class="tab-pane">
+        <div class="glass-card">
+          <div class="card-title">
+            <span>🌐 Security Header & Authentication Inspector</span>
+          </div>
+          <div class="form-group">
+            <label for="raw-header-input" class="form-label">Paste Raw Email MIME / Received Headers</label>
+            <textarea id="raw-header-input" class="form-textarea" style="font-family: var(--font-code); font-size: 0.82rem;" placeholder="Received: from mail.spam-server.xyz (mail.spam-server.xyz [192.168.1.105])
+Authentication-Results: spf=fail (sender IP 192.168.1.105)
+DKIM-Signature: v=1; a=rsa-sha256; d=fake-bank.com..."></textarea>
+          </div>
+          <div style="margin-top: 1rem;">
+            <button id="btn-parse-headers" class="btn btn-primary">
+              <span>🔍 Inspect Security Protocols</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <div class="card-title">
+            <span>🛡️ Protocol Verification Diagnostics</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
+            <div class="metric-card">
+              <span class="metric-lbl">SPF (Sender Policy Framework)</span>
+              <span id="header-spf-status" class="metric-val" style="font-size: 1.2rem; color: var(--text-dim);">Not Inspected</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-lbl">DKIM Signature Check</span>
+              <span id="header-dkim-status" class="metric-val" style="font-size: 1.2rem; color: var(--text-dim);">Not Inspected</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-lbl">DMARC Policy Enforcement</span>
+              <span id="header-dmarc-status" class="metric-val" style="font-size: 1.2rem; color: var(--text-dim);">Not Inspected</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/dataset.js"></script>
+  <script src="js/classifier.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
